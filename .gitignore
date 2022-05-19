@@ -2,4 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/event-publish-app/.vs/EventSubscription
+/event-publish-app/.vs
+/event-publish-app/obj
+/event-publish-app/bin
+/event-publish-app/release
