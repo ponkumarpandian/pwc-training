@@ -11,9 +11,9 @@ namespace EventSubscription
     internal class Program
     {
         // name of the event hub
-        private const string eventHubName = "order-processing";
+        private const string eventHubName = "{your event hub name}";
         // connection string to the Event Hubs
-        private const string connectionString = "Endpoint=sb://training-demo.servicebus.windows.net/;SharedAccessKeyName=policy-order-process;SharedAccessKey=yk7NSUh2/xh2idKZjOffVxmsJLFOGHiI/sEJhBcSKJs=;EntityPath=order-processing";
+        private const string connectionString = "{your event hub connection string}";
 
         static void Main(string[] args)
         {
