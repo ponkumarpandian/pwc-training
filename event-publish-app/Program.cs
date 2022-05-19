@@ -5,15 +5,16 @@ using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Producer;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
-namespace EventSubscription
+namespace EventPublish
 {
     internal class Program
     {
         // name of the event hub
-        private const string eventHubName = "{your event hub name}";
+        private const string eventHubName = "order-processing";
         // connection string to the Event Hubs
-        private const string connectionString = "{your event hub connection string}";
+        private const string connectionString = "Endpoint=sb://training-demo.servicebus.windows.net/;SharedAccessKeyName=policy-order-process;SharedAccessKey=yk7NSUh2/xh2idKZjOffVxmsJLFOGHiI/sEJhBcSKJs=;EntityPath=order-processing";
 
         static void Main(string[] args)
         {
@@ -28,7 +29,7 @@ namespace EventSubscription
 
             while (isRun)
             {
-                Console.WriteLine("*********** Welcom to Order Process System **************");
+                Console.WriteLine("*********** Welcom to Order Process System (Mocking) **************");
                 Console.WriteLine("Please option to start order/payment (type 1 or 2)");
                 Console.WriteLine("1. Order");
                 Console.WriteLine("2. Payment");
@@ -37,7 +38,7 @@ namespace EventSubscription
                 {
                     case 1:
                         Console.WriteLine("Please select the product you want to Order (Type 1 to 3)");
-                        produts = Constants.ProductPriceMap();
+                        produts = Constants.ProductPriceMap().OrderBy(p => (int)p.Item1).ToList();
                         foreach (var product in produts)
                         {
                             Console.WriteLine($"{(int)product.Item1}. {product.Item1}");
@@ -108,8 +109,8 @@ namespace EventSubscription
                     producerClient = new EventHubProducerClient(connectionString, eventHubName);
                     // Create a batch of events 
                     eventBatch = producerClient.CreateBatchAsync().Result;
-                    var orderJsonString = System.Text.Json.JsonSerializer.Serialize(order);
-                    if (!eventBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(orderJsonString))))
+                    var orderJsonString = JsonSerializer.Serialize(order);
+                    if (!eventBatch.TryAdd(new EventData(orderJsonString)))
                     {
                         // if it is too large for the batch
                         throw new Exception($"Event {order.OrderId} is too large for the batch and cannot be sent.");
@@ -120,7 +121,8 @@ namespace EventSubscription
                 {
                     // Use the producer client to send the batch of events to the event hub
                     producerClient.SendAsync(eventBatch);
-                    Console.WriteLine($"A batch of {order?.OrderId:numOfEvents} events has been published.");
+                    Console.WriteLine($"Event has been published for OrderId # {order?.OrderId:numOfEvents}.");
+                    Console.WriteLine($"Event Data : {JsonSerializer.Serialize(order)}.");
                 }
                 finally
                 {
